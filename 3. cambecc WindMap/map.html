@@ -15,6 +15,7 @@
 	<div id="container"></div>
 
 	<script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
+	<script src="L.CanvasLayer.js"></script>
 	<script src="windy.js"></script>
 	<script>
 		var WINDY, CANVAS;
@@ -24,20 +25,23 @@
 			// whoa there! No Canvas, no can do!
 			if (!document.createElement("canvas").getContext) return alert("Sorry, this is for Canvas-enabled browsers.");
 
-			mapBase = L.map('container').setView([37.36641, 127.10666], 10); //SK U타워
+			mapBase = L.map('container').setView([37.36641, 127.10666], 4); //SK U타워
 
 			L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				attribution: 'Map data © <a href="https://www.openstreetmap.org">OpenStreetMap</a> contributors, CC-BY-SA'
 			}).addTo(mapBase);
 
-			initWind();
+			L.canvasLayer()
+            .delegate(this) // -- if we do not inherit from L.CanvasLayer  we can setup a delegate to receive events from L.CanvasLayer
+            .addTo(mapBase);
 
 			mapBase.on('moveend', function() {
 				redrawWind();
 			});
+
 		}
 
-		function initWind() {
+		function onDrawLayer(info) {
 			fetch("http://greeninfo-network.github.io/AnimatedWindMapping/wind-surface-level-gfs.json")
 				.then(function(response) {
 					if (response.status !== 200) {
@@ -49,14 +53,14 @@
 				.then(function(json) {
 						var gfsdata = json;
 
-						CANVAS = document.createElement('canvas');
+						CANVAS = info.canvas;
 
 						CANVAS.id = "WindMapLayer";
 						CANVAS.width = document.getElementById('container' ).offsetWidth;
 						CANVAS.height = document.getElementById('container' ).offsetHeight;
-						CANVAS.style.zIndex = 9;
+						CANVAS.style.zIndex = 0;
 						CANVAS.style.position = "absolute";
-						document.getElementById('container').appendChild(CANVAS);
+						//document.getElementById('container').appendChild(CANVAS);
 
 						WINDY = new Windy({
 							canvas: CANVAS,
