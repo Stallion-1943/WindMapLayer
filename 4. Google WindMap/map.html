@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <title>Google map Wind Layer Test</title>
+    <style>
+      html, body, #map-div {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+    </style>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvb1aq38g54xlq0I9dtSVZO99A7QJ36i0"></script>
+    <script src="CanvasLayer.js"></script>
+    <script src="windy2.js"></script>
+    <script>
+      var map;
+      var canvasLayer;
+      var WINDY, CANVAS;
+
+      var resolutionScale = window.devicePixelRatio || 1;
+
+      function init() {
+        var mapOptions = {
+          zoom: 4,
+          center: new google.maps.LatLng(37.36641, 127.10666),
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          styles: [
+            {
+              stylers: [{saturation: -85}]
+            }, {
+              featureType: "water",
+              elementType: "geometry",
+              stylers: [
+                { lightness: -20 }
+              ]
+            }
+          ]
+        };
+        var mapDiv = document.getElementById('map-div');
+        map = new google.maps.Map(mapDiv, mapOptions);
+
+        map.addListener('dragend', function() {
+          redrawWind();
+        });
+        map.addListener('zoom_changed', function() {
+          redrawWind();
+        });
+
+        // initialize the canvasLayer
+        var canvasLayerOptions = {
+          map: map,
+          animate: true,
+          resolutionScale: resolutionScale
+        };
+        canvasLayer = new CanvasLayer(canvasLayerOptions);
+
+        onDrawLayer(canvasLayer);
+      }
+
+      function onDrawLayer(info) {
+			fetch("http://greeninfo-network.github.io/AnimatedWindMapping/wind-surface-level-gfs.json")
+				.then(function(response) {
+					if (response.status !== 200) {
+						console.log('OpenWeatherMap에 접근을 실패했습니다. Status code: ' + response.status);
+						return;
+					}
+					return response.json();
+				})
+				.then(function(json) {
+						var gfsdata = json;
+
+						CANVAS = info.canvas;
+
+						CANVAS.id = "WindMapLayer";
+						CANVAS.width = document.getElementById('map-div').offsetWidth;
+						CANVAS.height = document.getElementById('map-div').offsetHeight;
+						CANVAS.style.zIndex = 0;
+						CANVAS.style.position = "absolute";
+
+						WINDY = new Windy({
+							canvas: CANVAS,
+							data: gfsdata
+						});
+
+						// and kick it off!
+						redrawWind();
+					})
+					.catch(function(error) {
+						console.log('JSON Data를 파싱하던 중 오류가 발생했습니다.', error)
+					})
+				}
+
+      function redrawWind() {
+				WINDY.stop();
+
+				var bnds = map.getBounds();
+				var z = map.getZoom();
+				var width = document.getElementById('map-div').offsetWidth;
+				var height = document.getElementById('map-div').offsetHeight;
+
+				CANVAS.width = width;
+				CANVAS.height = height;
+
+				VELOCITY_SCALE = 1 / (3400 * z * z); // scale for wind velocity (completely arbitrary--this value looks nice)
+				PARTICLE_LINE_WIDTH = 0.167 * z + 0.267; // line width of a drawn particle
+				PARTICLE_MULTIPLIER = 32 * Math.pow(z, -1.28); // particle count scalar (completely arbitrary--test)
+				PARTICLE_REDUCTION = 11.5 * Math.pow(z, -2.4); // reduce particle count to this much of normal for mobile devices
+				MAX_WIND_INTENSITY = 10; // wind velocity at which particle intensity is maximum (m/s)
+				MAX_PARTICLE_AGE = 10; // max number of frames a particle is drawn before regeneration
+
+				WINDY.start(
+					[
+						[0, 0],
+						[width, height]
+					],
+					width,
+					height, [
+						[bnds.getSouthWest().lng(), bnds.getSouthWest().lat()],
+						[bnds.getNorthEast().lng(), bnds.getNorthEast().lat()]
+					]
+				);
+			}
+
+      document.addEventListener('DOMContentLoaded', init, false);
+    </script>
+  </head>
+
+  <body>
+    <div id="map-div"></div>
+  </body>
+</html>
