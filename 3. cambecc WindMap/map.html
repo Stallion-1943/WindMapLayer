@@ -42,7 +42,7 @@
 		}
 
 		function onDrawLayer(info) {
-			fetch("http://greeninfo-network.github.io/AnimatedWindMapping/wind-surface-level-gfs.json")
+			fetch("sample.json")
 				.then(function(response) {
 					if (response.status !== 200) {
 						console.log('OpenWeatherMap에 접근을 실패했습니다. Status code: ' + response.status);
