@@ -1,5 +1,5 @@
 {
-  "name": "WindMapLayer server",
+  "name": "windmaplayer_server",
   "version": "0.0.1",
   "description": "NOAA GFS grib2 Grabber using Socket.IO, Express, and Async.",
   "main": "app.js",
