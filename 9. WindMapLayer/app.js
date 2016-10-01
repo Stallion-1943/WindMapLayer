@@ -1,17 +1,14 @@
 var http = require('http');
 var path = require('path');
-var schedule = require("node-schedule");
 var fs = require("fs");
 var child_process = require("child_process");
 
 var async = require('async');
-var socketio = require('socket.io');
 var express = require('express');
+var schedule = require("node-schedule");
 
 //
 // # WindMapLayer server
-//
-// NOAA GFS grib2 Grabber using Socket.IO, Express, and Async.
 //
 var public_dir = path.resolve(__dirname, "public");
 var grib2json_path = path.resolve(__dirname, "../tool/grib2json-0.8.0/lib/grib2json-0.8.0-SNAPSHOT.jar");
@@ -90,8 +87,6 @@ function grabber() {
         },
         function(err, data, callback) {
             if (err) {
-                grib2stream = fs.createWriteStream(grib2file);
-
                 http.get(request_to_nomads, function(response) {
                     callback(null, response);
                 });
@@ -100,13 +95,15 @@ function grabber() {
         },
         function(response, callback) {
             if (response.statusCode == 200) {
+                grib2stream = fs.createWriteStream(grib2file);
+                
                 response.pipe(grib2stream).on('finish', function() {
                     fs.open(grib2file, "r", function(err, fd) {
                         callback(null, err, fd);
                     });
                 });
             } else
-                callback(true, "grabber: NOAA NOMADS server maybe dead :(...");
+                callback(true, "grabber: NOAA NOMADS server maybe isn`t ready yet :(...");
         },
         function(err, fd, callback) {
             if (err)
@@ -182,9 +179,20 @@ function grabber() {
 
 var router = express();
 var server = http.createServer(router);
-var io = socketio.listen(server);
 
 router.use(express.static(public_dir));
+
+router.get("/json/list.json", function(req, res) {
+    var files = [];
+    try {
+        files = fs.readdirSync(json_dir);
+
+        res.send(JSON.stringify(files.sort()));
+    }
+    catch (err) {
+        res.send("[]");
+    }
+});
 
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function() {
     var addr = server.address();
