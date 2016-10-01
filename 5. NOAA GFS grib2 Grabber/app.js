@@ -17,7 +17,7 @@ var public_dir = path.resolve(__dirname, "public");
 
 var cycles = ["00", "06", "12", "18"];
 
-var grabber = schedule.scheduleJob("*/1 * * * *", function() {
+schedule.scheduleJob("* */3 * * *", function() {
     var now = new Date();
     var yyyy = now.getUTCFullYear().toString();
     var mm = (now.getUTCMonth() + 1).toString();
@@ -38,7 +38,7 @@ var grabber = schedule.scheduleJob("*/1 * * * *", function() {
         hh +
         "z.pgrb2.1p00.f000&lev_10_m_above_ground=on&var_UGRD=on&var_VGRD=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90&dir=%2Fgfs." +
         filename;
-
+    
     var grib2stream;
     var grib2fd;
 
@@ -51,7 +51,7 @@ var grabber = schedule.scheduleJob("*/1 * * * *", function() {
         function(err, data, callback) {
             if (err) {
                 grib2stream = fs.createWriteStream(grib2file);
-                console.log(request_to_nomads);
+                
                 http.get(request_to_nomads, function(response) {
                     callback(null, response);
                 });
@@ -73,9 +73,9 @@ var grabber = schedule.scheduleJob("*/1 * * * *", function() {
                 callback(true, "grabber: grib2 file can`t open...");
             else {
                 grib2fd = fd;
-
+                
                 var header = new Buffer(4);
-
+                
                 fs.read(fd, header, 0, header.length, null, function(err, bytesRead, buffer) {
                     callback(null, err, bytesRead, buffer);
                 });
@@ -97,13 +97,14 @@ var grabber = schedule.scheduleJob("*/1 * * * *", function() {
     async.waterfall(tasks, function(err, msg) {
         if (err)
             console.log(msg);
-
+        
         if (grib2stream)
             grib2stream.close();
         if (grib2fd)
             fs.close(grib2fd);
     });
 
+    /* callback hell, go to async waterfall
     fs.stat(jsonfile, function(err, data) {
         if (err) {
             var grib2 = fs.createWriteStream(grib2file);
@@ -136,11 +137,9 @@ var grabber = schedule.scheduleJob("*/1 * * * *", function() {
         } else
             console.log("exist json file, passing away...");
     })
+    */
 });
 
-/*
-
-*/
 var router = express();
 var server = http.createServer(router);
 var io = socketio.listen(server);
