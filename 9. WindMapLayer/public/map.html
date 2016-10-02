@@ -18,6 +18,7 @@
 		<div id="datetime"></div>
 		<div id="arrowright">→</div>
 	</div>
+	<div id="logo"><img src="logo.png"></div>
 
 	<script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
 	<script src="js/L.CanvasLayer.js"></script>
@@ -47,7 +48,7 @@
 
 			if (source_list.length > 0) { //기상 정보 파일이 없다면 pass
 				source_selected_idx = source_list.length - 1;
-				
+
 				windMapLayer = L.canvasLayer();
 				windMapLayer.delegate(this).addTo(mapBase);
 
@@ -75,33 +76,33 @@
 
 				source_selected_idx = source_selected_idx - 1;
 			}
-			
+
 			windMapLayer.removeTo(mapBase);
 
 			windMapLayer = L.canvasLayer();
 			windMapLayer.delegate(this).addTo(mapBase);
 		}
-		
+
 		function UTCParse_from_filename(str) {
 			var yyyy = Number(str.substr(4, 4)),
-        		mm = Number(str.substr(8, 2)),
-        		dd = Number(str.substr(10, 2)),
-        		hh = Number(str.substr(12, 2));
-        		
-        	var datetime = new Date();
-        	
-        	datetime.setUTCFullYear(yyyy);
-        	datetime.setUTCMonth(mm);
-        	datetime.setUTCDate(dd);
-        	datetime.setUTCHours(hh, 0, 0, 0); //hour, min, sec, millisec
-        	
-        	return datetime;
+				mm = Number(str.substr(8, 2)),
+				dd = Number(str.substr(10, 2)),
+				hh = Number(str.substr(12, 2));
+
+			var datetime = new Date();
+
+			datetime.setUTCFullYear(yyyy);
+			datetime.setUTCMonth(mm);
+			datetime.setUTCDate(dd);
+			datetime.setUTCHours(hh, 0, 0, 0); //hour, min, sec, millisec
+
+			return datetime;
 		}
 
 		function onDrawLayer(info) {
 			var UTCdate = UTCParse_from_filename(source_list[source_selected_idx]);
 			document.getElementById("datetime").innerHTML = UTCdate.toUTCString();
-			
+
 			fetch("json/" + source_list[source_selected_idx])
 				.then(function(response) {
 					if (response.status !== 200) {

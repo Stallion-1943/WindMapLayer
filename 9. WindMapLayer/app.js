@@ -96,7 +96,7 @@ function grabber() {
         function(response, callback) {
             if (response.statusCode == 200) {
                 grib2stream = fs.createWriteStream(grib2file);
-                
+
                 response.pipe(grib2stream).on('finish', function() {
                     fs.open(grib2file, "r", function(err, fd) {
                         callback(null, err, fd);
@@ -140,41 +140,6 @@ function grabber() {
         if (grib2fd)
             fs.close(grib2fd);
     });
-
-    /* callback hell, go to async-waterfall ↑
-    fs.stat(jsonfile, function(err, data) {
-        if (err) {
-            var grib2 = fs.createWriteStream(grib2file);
-            var request_to_nomads = http.get("http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_1p00.pl?file=gfs.t" +
-                hh +
-                "z.pgrb2.1p00.f000&lev_10_m_above_ground=on&var_UGRD=on&var_VGRD=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90&dir=%2Fgfs." +
-                filename,
-                function(response) {
-                    response.pipe(grib2).on('finish', function() {
-                        fs.open(grib2file, "r", function(err, fd) {
-                            if (err)
-                                console.log("grib2 file not existe...");
-                            else {
-                                var header = new Buffer(4);
-                                fs.read(fd, header, 0, header.length, null, function(err, bytesRead, buffer) {
-                                    if (err)
-                                        console.log("grib2 read error...");
-                                    else {
-                                        if (buffer.toString() == "GRIB") {
-                                            child_process.spawn("java", ["-jar", "../tool/grib2json-0.8.0/lib/grib2json-0.8.0-SNAPSHOT.jar", "-d", "-n", "-o", jsonfile, grib2file]);
-                                        } else
-                                            console.log("this file is not GRIB2...");
-                                    }
-                                    fs.close();
-                                })
-                            }
-                        })
-                    });
-                });
-        } else
-            console.log("exist json file, passing away...");
-    })
-    */
 }
 
 var router = express();
@@ -188,8 +153,7 @@ router.get("/js/source_list.js", function(req, res) {
         files = fs.readdirSync(json_dir);
 
         res.send("var source_list = " + JSON.stringify(files.sort()));
-    }
-    catch (err) {
+    } catch (err) {
         res.send("var source_list = []");
     }
 });

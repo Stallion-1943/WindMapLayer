@@ -23,7 +23,6 @@ html, body {
     line-height: 50px;
     background-color: #808080;
     z-index: 9;
-    
     display: inline-block;
     text-align: center;
 }
@@ -37,7 +36,6 @@ html, body {
     border-color: white;
     border-width: 1px;
     color: white;
-    
     display: inline-block;
     text-align: center;
     vertical-align: middle;
@@ -49,7 +47,6 @@ html, body {
     line-height: 30px;
     height: 30px;
     color: white;
-    
     display: inline-block;
     text-align: center;
     vertical-align: middle;
@@ -64,8 +61,17 @@ html, body {
     border-color: white;
     border-width: 1px;
     color: white;
-    
     display: inline-block;
     text-align: center;
     vertical-align: middle;
+}
+
+#logo {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 115px;
+    height: 61px;
+    z-index: 9;
+    display: inline-block;
 }
