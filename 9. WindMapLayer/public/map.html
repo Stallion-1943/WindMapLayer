@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>WindMap</title>
+	<title>Leaflet</title>
 
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,37 +15,72 @@
 	<div id="container"></div>
 
 	<script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
-	<script src="L.CanvasLayer.js"></script>
-	<script src="windy.js"></script>
+	<script src="js/L.CanvasLayer.js"></script>
+	<script src="js/windy.js"></script>
+	<script src="js/source_list.js"></script> //server generated, not a real file.
 	<script>
 		var WINDY, CANVAS;
 		var mapBase;
 		var windMapLayer;
+
+		var source_selected_idx;
+		var source_path;
 
 		window.onload = function() {
 			// No Canvas, no can do!
 			if (!document.createElement("canvas").getContext)
 				return alert("Sorry, this is for Canvas-enabled browsers.");
 
-			mapBase = L.map("container").setView([37.36641, 127.10666], 4); //SK U타워
+			mapBase = L.map('container', {
+				center: [37.36641, 127.10666], //SK U타워
+				zoom: 4,
+				keyboard: false //키보드 화살표키 입력 무시
+			});
 
-			L.tileLayer("http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png", {
-				attribution: "Map data © <a href='https://www.openstreetmap.org'>OpenStreetMap</a> contributors, CC-BY-SA"
+			L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+				attribution: 'Map data © <a href="https://www.openstreetmap.org">OpenStreetMap</a> contributors, CC-BY-SA'
 			}).addTo(mapBase);
+
+			if (source_list.length > 0) { //기상 정보 파일이 없다면 pass
+				source_selected_idx = source_list.length - 1;
+
+				windMapLayer = L.canvasLayer();
+				windMapLayer.delegate(this).addTo(mapBase);
+
+				window.addEventListener('keyup', keyNavigate);
+
+				mapBase.on('moveend', function() {
+					redrawWind();
+				});
+			}
+		}
+
+		function keyNavigate(event) {
+			if (event.keyCode == 39) {
+				if (source_selected_idx == source_list.length - 1)
+					return;
+
+				source_selected_idx = source_selected_idx + 1;
+			}
+
+			if (event.keyCode == 37) {
+				if (source_selected_idx == 0)
+					return;
+
+				source_selected_idx = source_selected_idx - 1;
+			}
+
+			windMapLayer.removeTo(mapBase);
 
 			windMapLayer = L.canvasLayer();
 			windMapLayer.delegate(this).addTo(mapBase);
-
-			mapBase.on("moveend", function() {
-				redrawWind();
-			});
-		}
+		}, false);
 
 		function onDrawLayer(info) {
-			fetch("sample.json")
+			fetch("json/" + source_list[source_selected_idx])
 				.then(function(response) {
 					if (response.status !== 200) {
-						console.log("sample.json에 접근을 실패했습니다. Status code: " + response.status);
+						console.log('WindMapLayer server 접근을 실패했습니다. Status code: ' + response.status);
 						return;
 					}
 					return response.json();
@@ -56,21 +91,21 @@
 					CANVAS = info.canvas;
 
 					CANVAS.id = "WindMapLayer";
-					CANVAS.width = document.getElementById("container").offsetWidth;
-					CANVAS.height = document.getElementById("container").offsetHeight;
+					CANVAS.width = document.getElementById('container').offsetWidth;
+					CANVAS.height = document.getElementById('container').offsetHeight;
 					CANVAS.style.zIndex = 0;
 					CANVAS.style.position = "absolute";
-					//document.getElementById("container").appendChild(CANVAS);
 
 					WINDY = new Windy({
 						canvas: CANVAS,
 						data: gfsdata
 					});
 
+					// and kick it off!
 					redrawWind();
 				})
 				.catch(function(error) {
-					console.log("JSON Data를 파싱하던 중 오류가 발생했습니다.", error)
+					console.log('JSON Data를 파싱하던 중 오류가 발생했습니다.', error)
 				})
 		}
 
@@ -79,8 +114,8 @@
 
 			var bnds = mapBase.getBounds();
 			var z = mapBase.getZoom();
-			var width = document.getElementById("container").offsetWidth;
-			var height = document.getElementById("container").offsetHeight;
+			var width = document.getElementById('container').offsetWidth;
+			var height = document.getElementById('container').offsetHeight;
 
 			CANVAS.width = width;
 			CANVAS.height = height;
