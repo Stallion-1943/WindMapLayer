@@ -1,5 +1,4 @@
 # WindMapLayer
-==========
 
 WindMapLayer developed for projection with global wind conditions.
 
