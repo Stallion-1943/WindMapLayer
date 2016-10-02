@@ -53,7 +53,7 @@ async.parallel([
     if (err)
         console.log("oops! i can`t make it. :(");
     else
-        schedule.scheduleJob("*/1 * * * *", grabber);
+        schedule.scheduleJob("30 */3 * * *", grabber);
 });
 
 function grabber() {

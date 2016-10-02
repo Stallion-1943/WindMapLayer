@@ -85,7 +85,7 @@
 
 		function UTCParse_from_filename(str) {
 			var yyyy = Number(str.substr(4, 4)),
-				mm = Number(str.substr(8, 2)),
+				mm = Number(str.substr(8, 2)) - 1,
 				dd = Number(str.substr(10, 2)),
 				hh = Number(str.substr(12, 2));
 

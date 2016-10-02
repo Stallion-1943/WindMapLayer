@@ -42,6 +42,8 @@
 		L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 			attribution: 'Map data © <a href="https://www.openstreetmap.org">OpenStreetMap</a> contributors, CC-BY-SA'
 		}).addTo(mapBase);
+		
+		updateWeather();
 
 		mapBase.on('moveend', debounce(function() {
 			if (statinMarkerLayer)
@@ -53,7 +55,7 @@
 		}, 1000));
 
 		/* 날씨정보를 OpenWeatherMap에서 받아옵니다. */
-		var updateWeather = function() {
+		function updateWeather() {
 			/* OWM에는 해당 reactangle의 범위를 지정하여 해당 지역 내의 station 정보를 가져올 수 있는 API를 제공하지만,
 			불행히도 정상 동작하지 않습니다.
 			var mapBounds = mapBase.getBounds();
@@ -98,7 +100,6 @@
 					};
 
 					for (var i = 0; i < json.length; i++) {
-						console.log(json[i]);
 						geoJsonData.features.push(json2GeoJson(json[i]));
 					}
 
