@@ -51,7 +51,7 @@ async.parallel([
     if (err)
         console.log("oops! i can`t make it. :(");
     else
-        schedule.scheduleJob("*/1 * * * *", grabber);
+        schedule.scheduleJob("30 */3 * * *", grabber); //cron-style scheduler, maybe you can change this for adaptive by NOAA NOMADS real-uploaded time.
 });
 
 function grabber() {
@@ -182,15 +182,15 @@ var server = http.createServer(router);
 
 router.use(express.static(public_dir));
 
-router.get("/json/list.json", function(req, res) {
+router.get("/js/source_list.js", function(req, res) {
     var files = [];
     try {
         files = fs.readdirSync(json_dir);
 
-        res.send(JSON.stringify(files.sort()));
+        res.send("var source_list = " + JSON.stringify(files.sort()));
     }
     catch (err) {
-        res.send("[]");
+        res.send("var source_list = []");
     }
 });
 

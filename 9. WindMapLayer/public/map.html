@@ -2,29 +2,33 @@
 <html>
 
 <head>
-	<title>Leaflet</title>
+	<title>WindMapLayer</title>
 
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
-	<link rel="stylesheet" href="map.css" />
+	<link rel="stylesheet" href="css/map.css" />
 </head>
 
 <body>
 	<div id="container"></div>
+	<div id="nav">
+		<div id="arrowleft">←</div>
+		<div id="datetime"></div>
+		<div id="arrowright">→</div>
+	</div>
 
 	<script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
 	<script src="js/L.CanvasLayer.js"></script>
 	<script src="js/windy.js"></script>
-	<script src="js/source_list.js"></script> //server generated, not a real file.
+	<script src="js/source_list.js"></script>
 	<script>
 		var WINDY, CANVAS;
 		var mapBase;
 		var windMapLayer;
 
 		var source_selected_idx;
-		var source_path;
 
 		window.onload = function() {
 			// No Canvas, no can do!
@@ -43,11 +47,11 @@
 
 			if (source_list.length > 0) { //기상 정보 파일이 없다면 pass
 				source_selected_idx = source_list.length - 1;
-
+				
 				windMapLayer = L.canvasLayer();
 				windMapLayer.delegate(this).addTo(mapBase);
 
-				window.addEventListener('keyup', keyNavigate);
+				window.addEventListener('keydown', keyNavigate, false);
 
 				mapBase.on('moveend', function() {
 					redrawWind();
@@ -56,27 +60,48 @@
 		}
 
 		function keyNavigate(event) {
-			if (event.keyCode == 39) {
+			console.log(event.key);
+			if (event.key != "ArrowRight" && event.key != "ArrowLeft")
+				return;
+			if (event.key == "ArrowRight") {
 				if (source_selected_idx == source_list.length - 1)
 					return;
 
 				source_selected_idx = source_selected_idx + 1;
 			}
-
-			if (event.keyCode == 37) {
+			if (event.key == "ArrowLeft") {
 				if (source_selected_idx == 0)
 					return;
 
 				source_selected_idx = source_selected_idx - 1;
 			}
-
+			
 			windMapLayer.removeTo(mapBase);
 
 			windMapLayer = L.canvasLayer();
 			windMapLayer.delegate(this).addTo(mapBase);
-		}, false);
+		}
+		
+		function UTCParse_from_filename(str) {
+			var yyyy = Number(str.substr(4, 4)),
+        		mm = Number(str.substr(8, 2)),
+        		dd = Number(str.substr(10, 2)),
+        		hh = Number(str.substr(12, 2));
+        		
+        	var datetime = new Date();
+        	
+        	datetime.setUTCFullYear(yyyy);
+        	datetime.setUTCMonth(mm);
+        	datetime.setUTCDate(dd);
+        	datetime.setUTCHours(hh, 0, 0, 0); //hour, min, sec, millisec
+        	
+        	return datetime;
+		}
 
 		function onDrawLayer(info) {
+			var UTCdate = UTCParse_from_filename(source_list[source_selected_idx]);
+			document.getElementById("datetime").innerHTML = UTCdate.toUTCString();
+			
 			fetch("json/" + source_list[source_selected_idx])
 				.then(function(response) {
 					if (response.status !== 200) {
@@ -93,7 +118,7 @@
 					CANVAS.id = "WindMapLayer";
 					CANVAS.width = document.getElementById('container').offsetWidth;
 					CANVAS.height = document.getElementById('container').offsetHeight;
-					CANVAS.style.zIndex = 0;
+					CANVAS.style.zIndex = 99;
 					CANVAS.style.position = "absolute";
 
 					WINDY = new Windy({
