@@ -9,7 +9,7 @@ Using Javascript, node.js, express, node-scheduler, async.
 
 This project doubled as a tutorial, to follow subjects with number will be helpful.
 
-----------
+==========
 
 WindMapLayer는 지구상 바람의 상태를 맵 위에 시각화하기 위한 프로젝트입니다.
 
@@ -20,6 +20,6 @@ Javascript, Node.js, express 프레임워크, scheduler 모듈, async 모듈 등
 
 이 프로젝트는 튜토리얼의 기능도 겸하고 있으니, 번호 순서대로 따라가면 도움이 될 것입니다.
 
-----------
+==========
 
 **NOTE: HTML5 canvas, Fetch API 사용으로 IE에서는 동작하지 않습니다.**
