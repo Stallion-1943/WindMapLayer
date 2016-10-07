@@ -34,10 +34,10 @@
 		window.onload = function() {
 			// No Canvas, no can do!
 			if (!document.createElement("canvas").getContext)
-				return alert("Sorry, this is for Canvas-enabled browsers.");
+				return alert("이 browser는 canvas를 지원하지 않습니다.");
 
 			mapBase = L.map('container', {
-				maxZoom: 7, //
+				maxZoom: 7, // 글로벌 projection 문제로 Zoom 레벨 조정
 				minZoom: 3,
 				center: [37.36641, 127.10666], //SK U타워
 				zoom: 4,

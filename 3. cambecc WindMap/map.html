@@ -25,7 +25,7 @@
 		window.onload = function() {
 			// No Canvas, no can do!
 			if (!document.createElement("canvas").getContext)
-				return alert("Sorry, this is for Canvas-enabled browsers.");
+				return alert("이 browser는 canvas를 지원하지 않습니다.");
 
 			mapBase = L.map("container").setView([37.36641, 127.10666], 4); //SK U타워
 
