@@ -37,6 +37,8 @@
 				return alert("Sorry, this is for Canvas-enabled browsers.");
 
 			mapBase = L.map('container', {
+				maxZoom: 7, //
+				minZoom: 3,
 				center: [37.36641, 127.10666], //SK U타워
 				zoom: 4,
 				keyboard: false //키보드 화살표키 입력 무시
