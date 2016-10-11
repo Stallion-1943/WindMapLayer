@@ -18,10 +18,11 @@
 		<div id="datetime"></div>
 		<div id="arrowright">→</div>
 	</div>
-	<div id="logo"><img src="logo.png"></div>
+	<div id="logo"><img src="img/logo.png"></div>
 
 	<script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
 	<script src="js/L.CanvasLayer.js"></script>
+	<script src="js/leaflet.rotatedMarker.js"></script>
 	<script src="js/windy.js"></script>
 	<script src="js/source_list.js"></script>
 	<script>
@@ -30,6 +31,11 @@
 		var windMapLayer;
 
 		var source_selected_idx;
+		
+		var vesselIcon = L.icon({
+			iconUrl: "img/Container-Ship-Top-Red-icon.png",
+			iconSize: [64, 64]
+		});
 
 		window.onload = function() {
 			// No Canvas, no can do!
@@ -47,6 +53,11 @@
 			L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
 				attribution: 'Map data © <a href="https://www.openstreetmap.org">OpenStreetMap</a> contributors, CC-BY-SA'
 			}).addTo(mapBase);
+			
+			L.marker([37.36641, 127.10666], {
+				icon: vesselIcon,
+				rotationAngle: 45
+			}).bindPopup("SK SUMMIT<br>test").addTo(mapBase);
 
 			if (source_list.length > 0) { //기상 정보 파일이 없다면 pass
 				source_selected_idx = source_list.length - 1;
