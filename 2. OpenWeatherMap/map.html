@@ -42,7 +42,7 @@
 		L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 			attribution: 'Map data © <a href="https://www.openstreetmap.org">OpenStreetMap</a> contributors, CC-BY-SA'
 		}).addTo(mapBase);
-		
+
 		updateWeather();
 
 		mapBase.on('moveend', debounce(function() {
