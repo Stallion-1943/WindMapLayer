@@ -135,8 +135,6 @@ var Windy = function(params) {
         });
     };
 
-
-
     /**
      * @returns {Boolean} true if the specified value is not null and not undefined.
      */
@@ -330,7 +328,6 @@ var Windy = function(params) {
         })();
     };
 
-
     var animate = function(bounds, field) {
         function asColorStyle(r, g, b, a) {
             return "rgba(" + 243 + ", " + 243 + ", " + 238 + ", " + a + ")";
@@ -487,7 +484,6 @@ var Windy = function(params) {
                 windy.field = field;
                 animate(bounds, field);
             });
-
         });
     };
 
@@ -495,7 +491,6 @@ var Windy = function(params) {
         if (windy.field) windy.field.release();
         if (windy.timer) clearTimeout(windy.timer)
     };
-
 
     var windy = {
         params: params,
