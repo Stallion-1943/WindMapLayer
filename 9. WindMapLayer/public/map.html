@@ -25,6 +25,7 @@
 	<script src="js/leaflet.rotatedMarker.js"></script>
 	<script src="js/windy.js"></script>
 	<script src="js/source_list.js"></script>
+	<script src="js/vessel_list.js"></script>
 	<script>
 		var WINDY, CANVAS;
 		var mapBase;
@@ -54,10 +55,13 @@
 				attribution: 'Map data © <a href="https://www.openstreetmap.org">OpenStreetMap</a> contributors, CC-BY-SA'
 			}).addTo(mapBase);
 			
-			L.marker([37.36641, 127.10666], {
-				icon: vesselIcon,
-				rotationAngle: 45
-			}).bindPopup("SK SUMMIT<br>test").addTo(mapBase);
+			//
+			vessel_list.forEach(function(vessel, index, array) {
+					L.marker([vessel[0], vessel[1]], {
+					icon: vesselIcon,
+					rotationAngle: vessel[2]
+				}).bindPopup(vessel[3]).addTo(mapBase);
+			});
 
 			if (source_list.length > 0) { //기상 정보 파일이 없다면 pass
 				source_selected_idx = source_list.length - 1;
