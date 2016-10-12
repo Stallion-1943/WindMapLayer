@@ -288,7 +288,6 @@ var Windy = function(params) {
 
 
     var interpolateField = function(grid, bounds, extent, callback) {
-
         var projection = {};
         var velocityScale = bounds.height * VELOCITY_SCALE;
 
